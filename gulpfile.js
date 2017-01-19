@@ -31,11 +31,13 @@ var license = ['/**',
 //build tasks
 gulp.task('build-js', function(){
     gulp.src(dir.in)
-        .pipe(header(license, {pkg: pkg}))
-        .pipe(babel())
+        .pipe(babel({
+            presets: ['es2015']
+        }))
         .on('error', error)
+        .pipe(header(license, {pkg: pkg}))
         .pipe(gulp.dest(dir.out))
-        .pipe(uglify({preserveComments: 'licencse'}))
+        .pipe(uglify({preserveComments: 'license'}))
         .on('error', error)
         .pipe(rename({extname: '.min.js'}))
         .pipe(gulp.dest(dir.out))
