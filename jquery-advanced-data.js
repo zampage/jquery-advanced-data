@@ -11,7 +11,7 @@
     const getAllAttributes = function(node){
         var attributes = [];
         $.each(node.attributes, function(){
-            if(this.specified){
+            if(this.specified && this.name.indexOf('data-') === 0){
                 attributes[this.name.replace('data-', '')] = this.value;
             }
         });
