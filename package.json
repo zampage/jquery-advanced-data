@@ -1,0 +1,30 @@
+{
+  "name": "jquery-advanced-data",
+  "version": "0.0.1",
+  "description": "jQuery-advanced-data is a jQuery plugin for optimizing data attribute handling",
+  "main": "jquery-advanced-data.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zampage/jquery-advanced-data.git"
+  },
+  "author": "Markus Chiarot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zampage/jquery-advanced-data/issues"
+  },
+  "homepage": "https://github.com/zampage/jquery-advanced-data#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-header": "^1.8.8",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.8"
+  }
+}
