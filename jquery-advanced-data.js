@@ -55,12 +55,12 @@
             let attribute = getAttribute(key, node, $node);
 
             //add data to result
-            result.push([attribute, this]);
+            result.push(attribute);
 
         });
 
         //return one or multiple results
-        return (result.length == 1) ? result[0][0] : result;
+        return (result.length == 1) ? result[0] : result;
     };
 
 }(jQuery));
