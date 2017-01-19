@@ -12,7 +12,7 @@
         var attributes = [];
         $.each(node.attributes, function(){
             if(this.specified){
-                attributes[this.name] = this.value;
+                attributes[this.name.replace('data-', '')] = this.value;
             }
         });
         return attributes;
