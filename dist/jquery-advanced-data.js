@@ -23,7 +23,7 @@
         (function (global) {
             (function ($) {
 
-                global.ALL_DATA = 'jad-give-me-all-data-attributes';
+                global.ALL_DATA = 100;
 
                 var utility = require('./src/utility');
                 var data = require('./src/data');
@@ -68,7 +68,7 @@
              */
             getAllAttributes: function getAllAttributes($node) {
                 var attributes = [];
-                $.each($node.attributes, function () {
+                $.each($node.get(0).attributes, function () {
                     if (this.specified && this.name.indexOf('data-') === 0) {
                         attributes[this.name.replace('data-', '')] = this.value;
                     }
@@ -85,7 +85,7 @@
              * @returns {Array}
              */
             getAttribute: function getAttribute(key, $node) {
-                return key == ALL_DATA ? getAllAttributes($node) : $node.attr('data-' + key);
+                return key == ALL_DATA ? this.getAllAttributes($node) : $node.attr('data-' + key);
             }
 
         };

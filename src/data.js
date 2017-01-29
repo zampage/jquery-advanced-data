@@ -8,7 +8,7 @@ let jadData = {
      */
     getAllAttributes: function ($node) {
         var attributes = [];
-        $.each($node.attributes, function () {
+        $.each($node.get(0).attributes, function () {
             if (this.specified && this.name.indexOf('data-') === 0) {
                 attributes[this.name.replace('data-', '')] = this.value;
             }
@@ -25,7 +25,7 @@ let jadData = {
      * @returns {Array}
      */
     getAttribute: function (key, $node) {
-        return (key == ALL_DATA) ? getAllAttributes($node) : $node.attr('data-' + key);
+        return (key == ALL_DATA) ? this.getAllAttributes($node) : $node.attr('data-' + key);
     }
 
 };

@@ -1,6 +1,6 @@
 (function($){
 
-    global.ALL_DATA = 'jad-give-me-all-data-attributes';
+    global.ALL_DATA = 100;
 
     const utility = require('./src/utility');
     const data = require('./src/data');
