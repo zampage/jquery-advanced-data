@@ -21,14 +21,12 @@
   "homepage": "https://github.com/zampage/jquery-advanced-data#readme",
   "devDependencies": {
     "babel-preset-es2015": "^6.18.0",
-    "browserify": "^14.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-header": "^1.8.8",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.8",
-    "run-sequence": "^1.2.2",
-    "vinyl-source-stream": "^1.1.0"
+    "run-sequence": "^1.2.2"
   }
 }

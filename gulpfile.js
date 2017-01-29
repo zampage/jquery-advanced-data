@@ -4,8 +4,6 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
     header = require('gulp-header'),
-    browserify = require('browserify'),
-    source = require('vinyl-source-stream'),
     babel = require('gulp-babel'),
     runSequence = require('run-sequence');
 
@@ -13,8 +11,11 @@ var gulp = require('gulp'),
 var dir = {
     in: './jquery-advanced-data.js',
     out: './dist/',
-    src: './src/**/*.js',
-    browserifyName: 'jquery-advanced-data.js'
+};
+
+//names
+var name = {
+    simple: 'jquery-advanced-data.js',
 };
 
 //error handling
@@ -33,17 +34,9 @@ var license = ['/**',
     ' */',
     ''].join('\n');
 
-//browserify
-gulp.task('browserify', function(){
-    return browserify(dir.in).bundle()
-        .on('error', error)
-        .pipe(source(dir.browserifyName))
-        .pipe(gulp.dest(dir.out));
-});
-
 //build tasks
 gulp.task('compile', function(){
-    return gulp.src(dir.out + dir.browserifyName)
+    return gulp.src(dir.in)
         .pipe(babel({
             presets: ['es2015']
         }))
@@ -53,7 +46,7 @@ gulp.task('compile', function(){
 });
 
 gulp.task('uglify', function(){
-    gulp.src(dir.out + dir.browserifyName)
+    gulp.src(dir.out + name.simple)
         .pipe(uglify({preserveComments: 'license'}))
         .on('error', error)
         .pipe(rename({extname: '.min.js'}))
@@ -62,13 +55,12 @@ gulp.task('uglify', function(){
 
 //build
 gulp.task('build', function(callback){
-    runSequence('browserify', 'compile', 'uglify', callback);
+    runSequence('compile', 'uglify', callback);
 });
 
 //watch
 gulp.task('watch', function(){
     gulp.watch(dir.in, ['build']);
-    gulp.watch(dir.src, ['build']);
 });
 
 //default
