@@ -1,7 +1,7 @@
 /**
  * @author Markus Chiarot
  * @website https://github.com/zampage/jquery-advanced-data#readme 
- * @version 0.0.4
+ * @version 0.1.0
  * 
  * jQuery-advanced-data is a jQuery plugin for optimizing data attribute handling
  */
@@ -42,32 +42,6 @@
                  */
                 warnMultiple: function warnMultiple() {
                     console.warn('[jQuer-Adcanced-Data]: Warning, multiple nodes selected! Falling back to first node.');
-                },
-
-                /**
-                 * create result allowing for passing further functions
-                 *
-                 * @param obj
-                 * @returns {{}}
-                 */
-                createResult: function createResult(obj) {
-                    var result = {};
-                    var funcs = {
-                        toggle: functions.toggle
-                    };
-
-                    Object.keys(obj).forEach(function (key) {
-                        result[key] = obj[key];
-                    });
-
-                    Object.keys(funcs).forEach(function (key) {
-                        result[key] = function () {
-                            funcs[key]();
-                            return this;
-                        };
-                    });
-
-                    return result;
                 }
 
             };
@@ -94,7 +68,6 @@
                  * distinguish what attributes to get and return them
                  *
                  * @param key
-                 * @param node
                  * @param $node
                  * @returns {Array}
                  */
@@ -117,7 +90,7 @@
                  * convert kebab-case to camelCase
                  *
                  * @param input
-                 * @returns {*}
+                 * @returns {string}
                  */
                 convertToCamelCase: function convertToCamelCase(input) {
                     var output = input;
@@ -134,13 +107,36 @@
 
             var functions = {
 
+                /**
+                 * toggle value of the current data attribute
+                 *
+                 * @returns {{}}
+                 */
                 toggle: function toggle() {
+                    var positive = [true, "true", 1, "1", 1, "1", "yes"];
+                    var negative = [false, "false", 0, "0", -1, "-1", "no"];
+                    var positiveIdx = positive.indexOf(this.value);
+                    var negativeIdx = negative.indexOf(this.value);
+                    var newValue = void 0;
+                    var found = false;
 
-                    var positive = [true, 1, 'yes'];
+                    if (positiveIdx >= 0) {
+                        newValue = negative[positiveIdx];
+                        found = true;
+                    }
+                    if (negativeIdx >= 0) {
+                        newValue = positive[negativeIdx];
+                        found = true;
+                    }
 
-                    var negative = [false, 0, 'no'];
+                    if (found) {
+                        data.setAttribute(this.key, newValue, this.node);
+                        this.value = newValue;
+                    } else {
+                        console.error('[jQuery-Advanced-Data]: unable to toggle "data-' + this.key + '" with value "' + this.value + '"');
+                    }
 
-                    //TODO: implement
+                    return this;
                 }
 
             };
@@ -150,7 +146,7 @@
              *
              * @param key
              * @param val
-             * @returns {Array}
+             * @returns {{}}
              */
             $.fn.data = function (key, val) {
 
@@ -164,17 +160,19 @@
                 //select node
                 var $node = $(this.get(0));
 
-                //get attribute
-                var attribute = data.getAttribute(key, $node);
-
                 //set attribute
                 if (val !== NO_VAL_SET) data.setAttribute(key, val, $node);
 
+                //get attribute
+                var attribute = data.getAttribute(key, $node);
+
                 //create and return result
-                return utility.createResult({
+                return {
                     value: attribute,
-                    node: $node
-                });
+                    node: $node,
+                    key: key,
+                    toggle: functions.toggle
+                };
             };
         })(jQuery);
     }, {}] }, {}, [1]);
