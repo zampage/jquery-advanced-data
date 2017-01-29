@@ -3,14 +3,45 @@
     const ALL_DATA = 'jad-give-me-all-data-attributes';
 
     /**
+     * detect if multiple nodes are selected
+     *
+     * @param $nodes
+     * @returns {boolean}
+     */
+    const detectMultiple = function($nodes){
+        return $nodes.length > 1;
+    };
+
+    /**
+     * warn user about multiple node selection
+     */
+    const warnMultiple = function(){
+        console.warn('[jQuer-Adcanced-Data]: Warning, multiple nodes selected! Falling back to first node.')
+    };
+
+    /**
+     * create result allowing for passing further functions
+     *
+     * @param obj
+     * @returns {{}}
+     */
+    const createResult = function(obj){
+        let result = {};
+        Object.keys(obj).forEach(function(key){
+            result[key] = obj[key];
+        });
+        return result;
+    };
+
+    /**
      * get all attributes from a node
      *
      * @param node
      * @returns {Array}
      */
-    const getAllAttributes = function(node){
+    const getAllAttributes = function($node){
         var attributes = [];
-        $.each(node.attributes, function(){
+        $.each($node.attributes, function(){
             if(this.specified && this.name.indexOf('data-') === 0){
                 attributes[this.name.replace('data-', '')] = this.value;
             }
@@ -26,8 +57,8 @@
      * @param $node
      * @returns {Array}
      */
-    const getAttribute = function(key, node, $node){
-        return (key == ALL_DATA) ? getAllAttributes(node) : $node.attr('data-' + key);
+    const getAttribute = function(key, $node){
+        return (key == ALL_DATA) ? getAllAttributes($node) : $node.attr('data-' + key);
     };
 
     /**
@@ -41,26 +72,21 @@
         //parameters
         key = key || ALL_DATA;
 
-        //init result
-        let result = [];
+        //if necessary warn about multiple node selection
+        if(detectMultiple(this)) warnMultiple();
 
-        //loop nodes
-        this.each(function(){
+        //select node
+        let $node = $(this.get(0));
 
-            //set current node
-            let node = this;
-            let $node = $(node);
+        //get attribute
+        let attribute = getAttribute(key, $node);
 
-            //get data
-            let attribute = getAttribute(key, node, $node);
-
-            //add data to result
-            result.push(attribute);
-
+        //create and return result
+        return createResult({
+            value: attribute,
+            node: $node
         });
 
-        //return one or multiple results
-        return (result.length == 1) ? result[0] : result;
     };
 
 }(jQuery));
