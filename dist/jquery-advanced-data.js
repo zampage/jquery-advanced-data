@@ -1,7 +1,7 @@
 /**
  * @author Markus Chiarot
  * @website https://github.com/zampage/jquery-advanced-data#readme 
- * @version 0.0.3
+ * @version 0.0.4
  * 
  * jQuery-advanced-data is a jQuery plugin for optimizing data attribute handling
  */
@@ -20,116 +20,161 @@
         s(r[o]);
     }return s;
 })({ 1: [function (require, module, exports) {
-        (function (global) {
-            (function ($) {
+        (function ($) {
 
-                global.ALL_DATA = 100;
+            var ALL_DATA = 'jad-all-data';
+            var NO_VAL_SET = 'jad-no-val';
 
-                var utility = require('./src/utility');
-                var data = require('./src/data');
-                var functions = require('./src/functions');
+            var utility = {
 
                 /**
-                 * main jquery-plugin function
+                 * detect if multiple nodes are selected
                  *
-                 * @param key
+                 * @param $nodes
+                 * @returns {boolean}
+                 */
+                detectMultiple: function detectMultiple($nodes) {
+                    return $nodes.length > 1;
+                },
+
+                /**
+                 * warn user about multiple node selection
+                 */
+                warnMultiple: function warnMultiple() {
+                    console.warn('[jQuer-Adcanced-Data]: Warning, multiple nodes selected! Falling back to first node.');
+                },
+
+                /**
+                 * create result allowing for passing further functions
+                 *
+                 * @param obj
+                 * @returns {{}}
+                 */
+                createResult: function createResult(obj) {
+                    var result = {};
+                    var funcs = {
+                        toggle: functions.toggle
+                    };
+
+                    Object.keys(obj).forEach(function (key) {
+                        result[key] = obj[key];
+                    });
+
+                    Object.keys(funcs).forEach(function (key) {
+                        result[key] = function () {
+                            funcs[key]();
+                            return this;
+                        };
+                    });
+
+                    return result;
+                }
+
+            };
+
+            var data = {
+
+                /**
+                 * get all attributes from a node
+                 *
+                 * @param $node
                  * @returns {Array}
                  */
-                $.fn.data = function (key) {
-
-                    //parameters
-                    key = key || ALL_DATA;
-
-                    //if necessary warn about multiple node selection
-                    if (utility.detectMultiple(this)) utility.warnMultiple();
-
-                    //select node
-                    var $node = $(this.get(0));
-
-                    //get attribute
-                    var attribute = data.getAttribute(key, $node);
-
-                    //create and return result
-                    return utility.createResult({
-                        value: attribute,
-                        node: $node
+                getAllAttributes: function getAllAttributes($node) {
+                    var attributes = [];
+                    $.each($node.get(0).attributes, function () {
+                        if (this.specified && this.name.indexOf('data-') === 0) {
+                            attributes[this.name.replace('data-', '')] = this.value;
+                        }
                     });
-                };
-            })(jQuery);
-        }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
-    }, { "./src/data": 2, "./src/functions": 3, "./src/utility": 4 }], 2: [function (require, module, exports) {
-        var jadData = {
+                    return attributes;
+                },
 
-            /**
-             * get all attributes from a node
-             *
-             * @param node
-             * @returns {Array}
-             */
-            getAllAttributes: function getAllAttributes($node) {
-                var attributes = [];
-                $.each($node.get(0).attributes, function () {
-                    if (this.specified && this.name.indexOf('data-') === 0) {
-                        attributes[this.name.replace('data-', '')] = this.value;
+                /**
+                 * distinguish what attributes to get and return them
+                 *
+                 * @param key
+                 * @param node
+                 * @param $node
+                 * @returns {Array}
+                 */
+                getAttribute: function getAttribute(key, $node) {
+                    return key == ALL_DATA ? this.getAllAttributes($node) : $node.attr('data-' + key);
+                },
+
+                /**
+                 * set value for a key
+                 *
+                 * @param key
+                 * @param val
+                 * @param $node
+                 */
+                setAttribute: function setAttribute(key, val, $node) {
+                    $node.get(0).dataset[data.convertToCamelCase(key)] = val;
+                },
+
+                /**
+                 * convert kebab-case to camelCase
+                 *
+                 * @param input
+                 * @returns {*}
+                 */
+                convertToCamelCase: function convertToCamelCase(input) {
+                    var output = input;
+                    var exp = /-/g;
+                    var match = void 0;
+                    while ((match = exp.exec(output)) != null) {
+                        var idx = match.index;
+                        output = output.slice(0, idx) + output.charAt(idx + 1).toUpperCase() + output.slice(idx + 2, output.length);
                     }
-                });
-                return attributes;
-            },
+                    return output;
+                }
+
+            };
+
+            var functions = {
+
+                toggle: function toggle() {
+
+                    var positive = [true, 1, 'yes'];
+
+                    var negative = [false, 0, 'no'];
+
+                    //TODO: implement
+                }
+
+            };
 
             /**
-             * distinguish what attributes to get and return them
+             * main jquery-plugin function
              *
              * @param key
-             * @param node
-             * @param $node
+             * @param val
              * @returns {Array}
              */
-            getAttribute: function getAttribute(key, $node) {
-                return key == ALL_DATA ? this.getAllAttributes($node) : $node.attr('data-' + key);
-            }
+            $.fn.data = function (key, val) {
 
-        };
+                //parameters
+                key = key || ALL_DATA;
+                val = val || NO_VAL_SET;
 
-        module.exports = jadData;
-    }, {}], 3: [function (require, module, exports) {
-        var jadFunctions = {};
+                //if necessary warn about multiple node selection
+                if (utility.detectMultiple(this)) utility.warnMultiple();
 
-        module.exports = jadFunctions;
-    }, {}], 4: [function (require, module, exports) {
-        var jadUtility = {
+                //select node
+                var $node = $(this.get(0));
 
-            /**
-             * detect if multiple nodes are selected
-             *
-             * @param $nodes
-             * @returns {boolean}
-             */
-            detectMultiple: function detectMultiple($nodes) {
-                return $nodes.length > 1;
-            },
+                //get attribute
+                var attribute = data.getAttribute(key, $node);
 
-            /**
-             * warn user about multiple node selection
-             */
-            warnMultiple: function warnMultiple() {
-                console.warn('[jQuer-Adcanced-Data]: Warning, multiple nodes selected! Falling back to first node.');
-            },
+                //set attribute
+                if (val !== NO_VAL_SET) data.setAttribute(key, val, $node);
 
-            /**
-             * create result allowing for passing further functions
-             *
-             * @param obj
-             * @returns {{}}
-             */
-            createResult: function createResult(obj) {
-                var result = {};
-                Object.keys(obj).forEach(function (key) {
-                    result[key] = obj[key];
+                //create and return result
+                return utility.createResult({
+                    value: attribute,
+                    node: $node
                 });
-                return result;
-            }
-
-        };
-
-        module.exports = jadUtility;
+            };
+        })(jQuery);
     }, {}] }, {}, [1]);

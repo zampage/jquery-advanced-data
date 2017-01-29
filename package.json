@@ -1,6 +1,6 @@
 {
   "name": "jquery-advanced-data",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "jQuery-advanced-data is a jQuery plugin for optimizing data attribute handling",
   "main": "jquery-advanced-data.js",
   "directories": {
