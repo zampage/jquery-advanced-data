@@ -61,6 +61,7 @@
          * @param $node
          */
         setAttribute: function(key, val, $node){
+            /* FIXME: uset setAttribute(key, val) instead of dataset */
             $node.get(0).dataset[data.convertToCamelCase(key)] = val;
         },
 
